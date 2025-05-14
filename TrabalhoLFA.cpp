@@ -13,7 +13,7 @@ struct transicao{
     int prox;
 };
 
-bool testaPalavra(vector <vector <transicao>> grafo, vector <char> alfabeto, int inicio, string palavra, int fim){
+bool testaPalavra(vector <vector <transicao>> grafo, vector <char> alfabeto, int inicio, string palavra, vector <int> estadosFinais){
     int marcador  = inicio;
     stack <char> pilha;
     pilha.push('Z');
@@ -45,7 +45,7 @@ bool testaPalavra(vector <vector <transicao>> grafo, vector <char> alfabeto, int
                 achouCondicao = true;
                 break;     
             }
-            if(i->condicao == '#' && pilha.empty()){
+            if(i->condicao == '#' && pilha.top() == 'Z'){
                 if(i->empilha != '#'){
                     pilha.push(i->empilha);
                 }               
@@ -67,17 +67,20 @@ bool testaPalavra(vector <vector <transicao>> grafo, vector <char> alfabeto, int
         break;
         }   
     }
-    if (marcador == fim && pilha.size() == 1 && pilha.top() == 'Z') {
+    auto it = find(estadosFinais.begin(), estadosFinais.end(), marcador);
+    if (it != estadosFinais.end() && pilha.size() == 0) {
         return true;
     }
+    return false;
 }
 
 int main (){
     vector <vector <transicao>> grafo;
     vector <char> alfabeto;
+    vector <int> estadosFinais;
     char a;
 
-    int num, inicio, fim;
+    int num, inicio, fim, qtd;
 
     cout << "Coloque o alfabeto nessa poha" << endl;
     while ((a = cin.get()) != '\n'){
@@ -92,16 +95,28 @@ int main (){
     cout << "Qual automato vai ser o inicial nesse cacete?" << endl;
     cin >> inicio;
 
-    cout << "Qual automato vai ser final nesse lixo?" << endl;
-    cin >> fim;
+    cout << "Quantos automatos finais terao?" << endl;
+    cin >> qtd;
+
+    cout << "Quais automatos serao os finais nesse lixo?" << endl;
+    for(int i = 0; i < qtd; i++){
+        cin >> fim;
+        estadosFinais.push_back(fim);
+    }
+
+    if(fim > num){
+        cout << "seu burro do caralho digite algo certo uma vez na vida" << endl;
+        return -1;
+    }
     
     for(int i = 0; i < num; i++){
-        cout << "Quantas ligações essa poha de automato " << i << " faz?" << endl;
+        cout << "Quantas ligacoes essa poha de automato " << i << " faz?" << endl;
         int x;
         cin >> x;
         vector <transicao> v;
         for(int j = 0; j < x; j++){
             transicao t1;
+            cout << "ligacao " << j + 1 << ":" << endl;
             cout << "condicao: "<< endl;
             cin >> t1.condicao;
             cout << "desempilha: "<< endl;
@@ -122,7 +137,7 @@ int main (){
     for(int i = 0; i < num ; i++){
         string palavra;
         cin >> palavra;
-        bool conf = testaPalavra(grafo, alfabeto, inicio, palavra, fim);
+        bool conf = testaPalavra(grafo, alfabeto, inicio, palavra, estadosFinais);
 
         if(conf){
             cout << "Essa coisa horrorosa foi aceita" << endl;
